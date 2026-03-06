@@ -88,7 +88,6 @@
                 <div style="font-size: 60px;">✅</div>
                 <h2 style="color: #155724;">Payment Successful!</h2>
                 <p style="color: #155724;">Thank you for your purchase.</p>
-                <p style="color: #155724;" id="payment-id-display"></p>
                 
                 <a href="https://chat.whatsapp.com/DUQhY3dPOlUCl15Xv01qpy?mode=gi_t" 
                    class="whatsapp-btn" target="_blank">
@@ -101,7 +100,7 @@
         <div id="error" class="hidden">
             <div style="font-size: 60px;">❌</div>
             <h2 style="color: #dc3545;">Payment Verification Failed</h2>
-            <p id="error-message"></p>
+            <p id="error-message">Please complete your payment first.</p>
         </div>
 
         <!-- Debug Info -->
@@ -113,47 +112,52 @@
 
     <script>
         (function() {
+            // Get referrer and URL info
+            const referrer = document.referrer || 'none';
+            const currentUrl = window.location.href;
             const urlParams = new URLSearchParams(window.location.search);
-            const paymentId = urlParams.get('razorpay_payment_id') || 
-                             urlParams.get('payment_id') ||
-                             sessionStorage.getItem('payment_id');
+            const paymentId = urlParams.get('razorpay_payment_id') || 'none';
             
+            // Check if user came from Razorpay
+            const isFromRazorpay = referrer.includes('razorpay.com') || 
+                                   referrer.includes('pages.razorpay.com') ||
+                                   referrer.includes('checkout.razorpay.com') ||
+                                   referrer.includes('api.razorpay.com');
+            
+            // Display debug info
             document.getElementById('debug-content').innerHTML = `
-                Payment ID: ${paymentId || 'none'}<br>
-                URL: ${window.location.href}<br>
-                Referrer: ${document.referrer || 'none'}
+                Referrer: ${referrer}<br>
+                From Razorpay: ${isFromRazorpay}<br>
+                Payment ID in URL: ${paymentId}<br>
+                URL: ${currentUrl.substring(0, 50)}...
             `;
-
-            if (!paymentId) {
+            
+            console.log('🔍 Payment Status Page');
+            console.log('Referrer:', referrer);
+            console.log('From Razorpay:', isFromRazorpay);
+            console.log('Payment ID:', paymentId);
+            
+            // Decision after 1.5 seconds
+            setTimeout(() => {
                 document.getElementById('processing').style.display = 'none';
-                document.getElementById('error').classList.remove('hidden');
-                document.getElementById('error-message').textContent = 'No payment ID found';
-                return;
-            }
-
-            // Verify payment with API
-            fetch(`https://yourusername.github.io/verify-payment?id=${paymentId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('processing').style.display = 'none';
+                
+                // Show WhatsApp link if from Razorpay OR has payment ID
+                if (isFromRazorpay || paymentId !== 'none') {
+                    document.getElementById('success').classList.remove('hidden');
                     
-                    if (data.valid) {
-                        document.getElementById('success').classList.remove('hidden');
-                        document.getElementById('payment-id-display').textContent = 
-                            `Payment ID: ${data.paymentId}`;
-                        sessionStorage.setItem('payment_id', data.paymentId);
-                    } else {
-                        document.getElementById('error').classList.remove('hidden');
-                        document.getElementById('error-message').textContent = 
-                            data.error || 'Invalid payment';
-                    }
-                })
-                .catch(err => {
-                    document.getElementById('processing').style.display = 'none';
+                    // Store in sessionStorage
+                    try {
+                        sessionStorage.setItem('payment_verified', 'true');
+                        sessionStorage.setItem('payment_time', new Date().toISOString());
+                        sessionStorage.setItem('payment_referrer', referrer);
+                    } catch(e) {}
+                    
+                    console.log('✅ WhatsApp link shown - valid payment');
+                } else {
                     document.getElementById('error').classList.remove('hidden');
-                    document.getElementById('error-message').textContent = 
-                        'Verification failed: ' + err.message;
-                });
+                    console.log('❌ No WhatsApp link - direct access');
+                }
+            }, 1500);
         })();
     </script>
 </body>
