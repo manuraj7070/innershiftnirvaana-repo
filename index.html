@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Status - Inner Shift Nirvaana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .success-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .whatsapp-btn {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 20px 0;
+            transition: all 0.3s;
+        }
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .debug-info {
+            margin-top: 20px;
+            padding: 10px;
+            background: #1e1e2f;
+            color: #0f0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Processing State -->
+        <div id="processing">
+            <div class="spinner"></div>
+            <h2>Verifying Your Payment</h2>
+            <p>Please wait while we confirm your transaction...</p>
+        </div>
+
+        <!-- Success State - WhatsApp Link -->
+        <div id="success" class="hidden">
+            <div class="success-box">
+                <div style="font-size: 60px;">✅</div>
+                <h2 style="color: #155724;">Payment Successful!</h2>
+                <p style="color: #155724;">Thank you for your purchase.</p>
+                <p style="color: #155724;" id="payment-id-display"></p>
+                
+                <a href="https://chat.whatsapp.com/DUQhY3dPOlUCl15Xv01qpy?mode=gi_t" 
+                   class="whatsapp-btn" target="_blank">
+                    📱 Join WhatsApp Group
+                </a>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="hidden">
+            <div style="font-size: 60px;">❌</div>
+            <h2 style="color: #dc3545;">Payment Verification Failed</h2>
+            <p id="error-message"></p>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="debug-info" id="debug">
+            <strong>Debug Info:</strong><br>
+            <span id="debug-content"></span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentId = urlParams.get('razorpay_payment_id') || 
+                             urlParams.get('payment_id') ||
+                             sessionStorage.getItem('payment_id');
+            
+            document.getElementById('debug-content').innerHTML = `
+                Payment ID: ${paymentId || 'none'}<br>
+                URL: ${window.location.href}<br>
+                Referrer: ${document.referrer || 'none'}
+            `;
+
+            if (!paymentId) {
+                document.getElementById('processing').style.display = 'none';
+                document.getElementById('error').classList.remove('hidden');
+                document.getElementById('error-message').textContent = 'No payment ID found';
+                return;
+            }
+
+            // Verify payment with API
+            fetch(`https://yourusername.github.io/verify-payment?id=${paymentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('processing').style.display = 'none';
+                    
+                    if (data.valid) {
+                        document.getElementById('success').classList.remove('hidden');
+                        document.getElementById('payment-id-display').textContent = 
+                            `Payment ID: ${data.paymentId}`;
+                        sessionStorage.setItem('payment_id', data.paymentId);
+                    } else {
+                        document.getElementById('error').classList.remove('hidden');
+                        document.getElementById('error-message').textContent = 
+                            data.error || 'Invalid payment';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('processing').style.display = 'none';
+                    document.getElementById('error').classList.remove('hidden');
+                    document.getElementById('error-message').textContent = 
+                        'Verification failed: ' + err.message;
+                });
+        })();
+    </script>
+</body>
+</html>
