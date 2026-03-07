@@ -63,13 +63,16 @@
         }
         .debug-info {
             margin-top: 20px;
-            padding: 10px;
-            background: #1e1e2f;
-            color: #0f0;
+            padding: 15px;
+            background: #1e1e2f !important;  /* Dark background */
+            color: #00ff00 !important;        /* Bright green text */
+            border: 2px solid #00ff00;
             border-radius: 5px;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 14px;
             text-align: left;
+            display: block !important;        /* Force display */
+            opacity: 1 !important;             /* Force visibility */
         }
     </style>
 </head>
@@ -121,6 +124,23 @@
             const urlParams = new URLSearchParams(window.location.search);
             const paymentId = urlParams.get('razorpay_payment_id') || 'none';
             
+            // Check computed styles
+            const debug = document.getElementById('debug');
+            const styles = window.getComputedStyle(debug);
+            debug.style.background = '#000';
+            debug.style.color = '#0f0';
+            debug.style.padding = '20px';
+            debug.style.border = '3px solid #0f0';
+            debug.style.margin = '20px 0';
+            debug.style.display = 'block';
+            debug.style.fontSize = '14px';
+            debug.style.fontFamily = 'monospace';
+            console.log('Display:', styles.display);
+            console.log('Visibility:', styles.visibility);
+            console.log('Opacity:', styles.opacity);
+            console.log('Color:', styles.color);
+            console.log('Background:', styles.backgroundColor);
+
             // Check if user came from Razorpay
             const isFromRazorpay = referrer.includes('razorpay.com') || 
                                    referrer.includes('pages.razorpay.com') ||
