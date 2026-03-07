@@ -123,6 +123,14 @@
             const currentUrl = window.location.href;
             const urlParams = new URLSearchParams(window.location.search);
             const paymentId = urlParams.get('razorpay_payment_id') || 'none';
+
+                        // At the top of your script, after getting paymentId from URL
+            const urlPaymentId = urlParams.get('razorpay_payment_id');
+
+            // Then in your success section, add this:
+            if (urlPaymentId && urlPaymentId !== 'none') {
+                document.getElementById('payment-id-display').textContent = urlPaymentId;
+            }
             
             // Check computed styles
             const debug = document.getElementById('debug');
@@ -223,6 +231,10 @@ fetch('https://render-payment-webhook-production-c909.up.railway.app/api/recent-
                 if (isFromRazorpay || paymentId !== 'none') {
                     document.getElementById('success').classList.remove('hidden');
                     
+                    // ✅ ADD THIS - Display payment ID from URL
+                    if (paymentId !== 'none') {
+                        document.getElementById('payment-id-display').textContent = paymentId;
+                    }                   
                     // Store in sessionStorage
                     try {
                         sessionStorage.setItem('payment_verified', 'true');
@@ -237,6 +249,32 @@ fetch('https://render-payment-webhook-production-c909.up.railway.app/api/recent-
                 }
             }, 1500);
         })();
+// Decision after 1.5 seconds
+        setTimeout(() => {
+            document.getElementById('processing').style.display = 'none';
+            
+            // Show WhatsApp link if from Razorpay OR has payment ID
+            if (isFromRazorpay || paymentId !== 'none') {
+                document.getElementById('success').classList.remove('hidden');
+                
+                // ✅ DISPLAY PAYMENT ID FROM URL
+                if (paymentId !== 'none') {
+                    document.getElementById('payment-id-display').textContent = paymentId;
+                }
+                
+                // Store in sessionStorage
+                try {
+                    sessionStorage.setItem('payment_verified', 'true');
+                    sessionStorage.setItem('payment_time', new Date().toISOString());
+                    sessionStorage.setItem('payment_referrer', referrer);
+                } catch(e) {}
+                
+                console.log('✅ WhatsApp link shown - valid payment');
+            } else {
+                document.getElementById('error').classList.remove('hidden');
+                console.log('❌ No WhatsApp link - direct access');
+            }
+        }, 1500);
     </script>
 </body>
 </html>
