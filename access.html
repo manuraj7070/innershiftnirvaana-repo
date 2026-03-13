@@ -639,7 +639,22 @@
                 // Non-critical error - user can still proceed
             }
         }
-        
+        // --- This replaces your existing success handler logic ---
+
+        // 1. Generate a unique access code (this should call your backend)
+        async function handlePaymentSuccess(paymentData) {
+            const accessCode = await generateAccessCode(paymentData); // Your backend function
+            
+            // 2. Create the obfuscated link to your access page
+            const obfuscatedLink = `https://pay.innershiftnirvaana.space/access.html?code=${accessCode}`;
+            
+            // 3. Update the "Join WhatsApp Group" button to point to the obfuscated link
+            const joinButton = document.querySelector('.whatsapp-button'); // Adjust selector as needed
+            joinButton.href = obfuscatedLink;
+            joinButton.textContent = '🔑 Get Secure Access Link'; // Optional: change button text
+            
+            // The rest of your success UI logic...
+        }
         // Show success state
         function showSuccess() {
             loadingState.classList.add('hidden');
