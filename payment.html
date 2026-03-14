@@ -760,6 +760,27 @@
 // ============================================
 // UPDATED FRONTEND - Just one API call!
 // ============================================
+// Add this at the beginning of handlePayment, after getting form values
+function sanitizeCustomerData(fullname, email, phone) {
+    // Remove any emojis or special Unicode characters from name
+    fullname = fullname.replace(/[^\x00-\x7F]/g, '').trim();
+    
+    // Remove emojis from email (though they shouldn't be there)
+    email = email.replace(/[^\x00-\x7F]/g, '').trim();
+    
+    // Clean phone number - keep only digits and optional plus
+    phone = phone.replace(/[^\d+]/g, '');
+    
+    // Ensure phone starts with + if country code present, otherwise add default
+    if (phone.length === 10) {
+        phone = '+91' + phone; // Default to India
+    } else if (!phone.startsWith('+')) {
+        phone = '+' + phone;
+    }
+    
+    return { fullname, email, phone };
+}
+
 
         async function handlePayment() {
             console.log('💰 Payment button clicked');
@@ -770,6 +791,12 @@
             const phone = document.getElementById('phone').value.trim();
             
             try {
+// Use it right after getting the values
+let cleanData = sanitizeCustomerData(fullname, email, phone);
+fullname = cleanData.fullname;
+email = cleanData.email;
+phone = cleanData.phone;
+                
 // STEP 1: Clear ALL cached Razorpay data
 console.log('🧹 Clearing Razorpay cache...');
 localStorage.removeItem('razorpay_session');
