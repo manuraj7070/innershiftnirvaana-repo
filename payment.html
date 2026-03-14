@@ -770,6 +770,20 @@
             const phone = document.getElementById('phone').value.trim();
             
             try {
+// STEP 1: Clear ALL cached Razorpay data
+console.log('🧹 Clearing Razorpay cache...');
+localStorage.removeItem('razorpay_session');
+sessionStorage.clear();
+
+// Also clear any existing Razorpay instance
+if (window.rzp) {
+    delete window.rzp;
+}
+
+// Optional: Clear cookies related to Razorpay
+document.cookie.split(";").forEach(function(c) { 
+    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+});
                 payButton.disabled = true;
                 payButton.textContent = 'Initializing...';
                 
@@ -781,7 +795,9 @@
                         amount: 51, // ₹51
                         fullname: fullname,
                         email: email,
-                        phone: phone
+                        phone: phone,
+        // Add a unique timestamp to force new session
+        _t: Date.now()
                     })
                 });
                 
