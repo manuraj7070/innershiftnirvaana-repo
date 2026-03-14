@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addiction Healing Workshop Registration</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        label.required::after {
+            content: ' *';
+            color: #dc3545;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Error state styles */
+        input.error {
+            border-color: #dc3545;
+            background-color: #fff8f8;
+        }
+        input.error:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+        
+        /* Success state (optional) */
+        input.valid {
+            border-color: #28a745;
+        }
+        
+        /* Error message styling */
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        .error-message.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .product-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .amount {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-direction: row-reverse; /* This puts Already Paid? on left, Pay Now on right */
+        }
+        .button-group button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #pay-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        #already-paid-btn {
+            background: #25D366;
+            color: white;
+        }
+        #pay-button:hover, #already-paid-btn:hover {
+            transform: translateY(-2px);
+        }
+        #pay-button:disabled, #already-paid-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #payment-id-section {
+            margin-top: 20px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        #payment-id-section.show {
+            display: block;
+        }
+        #get-link-btn {
+            width: 100%;
+            padding: 15px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        #get-link-btn:hover {
+            background: #128C7E;
+        }
+        #get-link-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 25px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .payment-id {
+            font-family: monospace;
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        .whatsapp-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 15px 25px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+        }
+        .whatsapp-button:hover {
+            background: #128C7E;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .link-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f0f9f0;
+            border-left: 4px solid #25D366;
+            border-radius: 8px;
+            display: none;
+        }
+        .link-result.show {
+            display: block;
+        }
+        .payment-details-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .payment-details-box p {
+            margin: 8px 0;
+        }
+        .payment-details-box strong {
+            color: #555;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        .tag-instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .tag-instructions ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        
+        /* Summary of errors */
+        .error-summary {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .error-summary.show {
+            display: block;
+        }
+        .error-summary ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+    </style>
+    
+    <!-- Load Razorpay script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- Error Summary (shows when trying to submit with errors) -->
+            <div id="error-summary" class="error-summary">
+                <strong>Please fix the following errors:</strong>
+                <ul id="error-list">
+                </ul>
+            </div>
+            
+            <!-- Payment Form Section -->
+            <div id="payment-form">
+                <h1>Addiction Healing Workshop</h1>
+                <div class="subtitle">Transform your life with our guided sessions</div>
+                
+                <!-- Intake Form Fields (shared for both flows) -->
+                <div class="form-group">
+                    <label for="fullname" class="required">Full Name</label>
+                    <input type="text" id="fullname" placeholder="Enter your full name" 
+                           oninput="validateField('fullname', 'Full name is required')"
+                           onblur="validateField('fullname', 'Full name is required')">
+                    <div id="fullname-error" class="error-message">Full name is required</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="required">Email Address</label>
+                    <input type="email" id="email" placeholder="you@example.com"
+                           oninput="validateEmail()"
+                           onblur="validateEmail()">
+                    <div id="email-error" class="error-message">Valid email is required</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone" class="required">Phone Number (with country code)</label>
+                    <input type="tel" id="phone" placeholder="+919876543210"
+                           oninput="validatePhone()"
+                           onblur="validatePhone()">
+                    <div id="phone-error" class="error-message">Valid phone number with country code is required</div>
+                </div>
+                
+                <div class="product-details">
+                    <h3>Workshop Fee</h3>
+                    <p>One-time payment for full access</p>
+                </div>
+                
+                <div class="amount" id="amount-display">₹51</div>
+                
+                <!-- Button Group - Already Paid? on left, Pay Now on right -->
+                <div class="button-group">
+                    <button id="pay-button" type="button" onclick="validateAndPay()">💰 Pay Now</button>
+                    <button id="already-paid-btn" type="button" onclick="showPaymentIdSection()">🔍 Already Paid?</button>
+                </div>
+                
+                <!-- Payment ID Section (Hidden initially) -->
+                <div id="payment-id-section">
+                    <div class="form-group">
+                        <label for="payment-id" class="required">Payment ID</label>
+                        <input type="text" id="payment-id" placeholder="Enter your payment ID (e.g., pay_SQToPV0FDqas5k)"
+                               oninput="validatePaymentId()"
+                               onblur="validatePaymentId()">
+                        <div id="payment-id-error" class="error-message">Payment ID is required</div>
+                    </div>
+                    <button id="get-link-btn" type="button" onclick="validateAndGetLink()">🔑 Get WhatsApp Link</button>
+                    
+                    <!-- Loader -->
+                    <div id="link-loader" class="loader"></div>
+                    
+                    <!-- Alert Messages -->
+                    <div id="link-alert" class="alert"></div>
+                    
+                    <!-- Link Result Container -->
+                    <div id="link-result" class="link-result">
+                        <h4 style="margin-bottom: 15px; color: #155724;">✅ Payment Verified!</h4>
+                        
+                        <div id="payment-details-display" class="payment-details-box"></div>
+                        
+                        <!-- DIRECT WHATSAPP LINK (no obfuscation) -->
+                        <div style="margin: 20px 0;">
+                            <a href="#" id="direct-whatsapp-link" class="whatsapp-button" target="_blank">
+                                📱 Join WhatsApp Group Now
+                            </a>
+                        </div>
+                        
+                        <!-- Member Tag Instructions -->
+                        <div class="tag-instructions">
+                            <span class="badge">IMPORTANT</span>
+                            <strong>After joining, set your member tag:</strong>
+                            <ol>
+                                <li>Tap group name → Members → "You"</li>
+                                <p style="margin: 8px 0 8px 20px;">5. Tap <strong>"You"</strong> → <strong style="background: #e8f5e8; padding: 2px 5px;">"Add member tag"</strong> <span style="color: #dc3545;">(mobile only)</span></p>
+                                <li>Enter your Payment ID: <span id="payment-id-tag" style="font-family: monospace; background: #fff; padding: 2px 5px; border-radius: 3px;"></span></li>
+                                <li>Save - This verifies your membership!</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-text" style="margin-top: 15px;">
+                            ⏱️ Keep this link safe. Reset group link periodically for security.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Success Section (Hidden initially) - Shows after new payment -->
+            <div id="success-section" class="hidden">
+                <h1>🎉 Registration Successful!</h1>
+                <div class="subtitle">Thank you for joining our workshop</div>
+                
+                <div class="status success">
+                    <strong>✅ Payment Received!</strong>
+                    
+                    <div class="payment-id" id="payment-id-display"></div>
+                    
+                    <!-- DIRECT WHATSAPP LINK for new payments -->
+                    <div style="margin: 20px 0;">
+                        <a href="#" id="success-whatsapp-link" class="whatsapp-button" target="_blank">
+                            📱 Join WhatsApp Group Now
+                        </a>
+                    </div>
+                    
+                    <!-- Member Tag Instructions for new payment -->
+                    <div class="tag-instructions">
+                        <span class="badge">IMPORTANT</span>
+                        <strong>Set your member tag:</strong>
+                        <ol>
+                            <li>After clicking the button above to join</li>
+                            <li>Tap group name → Members → "You"</li>
+                            <li>Tap <strong>"Add member tag"</strong> <span style="color: #dc3545; font-size: 12px;">(mobile only)</span></li>
+                            <li>Enter your Payment ID: <span id="new-payment-id-tag" style="font-family: monospace; background: #fff; padding: 2px 5px; border-radius: 3px;"></span></li>
+                            <li>Tap Save</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="info-text">
+                        ⏱️ Members without valid Payment ID tags will be removed.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In your HTML, replace hardcoded RAZORPAY_KEY_ID with:
+        // ✅ CORRECT - Your updated client code should look like this:
+
+        let RAZORPAY_KEY_ID = null;
+        let keyLoadPromise = null;
+        // Your backend API URL
+        const API_BASE_URL = 'https://render-payment-webhook-production-c909.up.railway.app';       
+
+        // The REAL WhatsApp group link - shown directly on success
+        const REAL_WHATSAPP_LINK = 'https://chat.whatsapp.com/E5DIDyWe0paKuJccKHng84?mode=gi_t';
+        
+        let currentPaymentData = null;
+
+        // Create a promise that resolves when key is loaded
+        function loadRazorpayKey() {
+            if (keyLoadPromise) return keyLoadPromise;
+            
+            keyLoadPromise = new Promise(async (resolve, reject) => {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/api/get-public-key`);
+                    const data = await response.json();
+                    RAZORPAY_KEY_ID = data.key_id;
+                    console.log('✅ Razorpay key loaded:', RAZORPAY_KEY_ID);
+                    resolve(RAZORPAY_KEY_ID);
+                } catch (error) {
+                    console.error('❌ Failed to load Razorpay key:', error);
+                    reject(error);
+                }
+            });
+            
+            return keyLoadPromise;
+        }
+
+        // Start loading immediately
+        loadRazorpayKey();
+
+        // Update validateAndPay to wait if needed
+        async function validateAndPay() {
+            if (!RAZORPAY_KEY_ID) {
+                // Show loading indicator
+                document.getElementById('pay-button').disabled = true;
+                document.getElementById('pay-button').textContent = 'Loading payment system...';
+                
+                try {
+                    await loadRazorpayKey(); // Wait for key to load
+                    document.getElementById('pay-button').disabled = false;
+                    document.getElementById('pay-button').textContent = '💰 Pay Now';
+                } catch (error) {
+                    alert('Failed to load payment system. Please refresh.');
+                    return;
+                }
+            }
+            
+            if (validateAllFields(false)) {
+                handlePayment();
+            }
+        }
+
+
+/*         let RAZORPAY_KEY_ID = null;
+
+        // Disable buttons initially with loading text
+        document.addEventListener('DOMContentLoaded', function() {
+            const payBtn = document.getElementById('pay-button');
+            const alreadyBtn = document.getElementById('already-paid-btn');
+            
+            payBtn.disabled = true;
+            alreadyBtn.disabled = true;
+            payBtn.textContent = '⏳ Loading...';
+            
+            fetch(`${API_BASE_URL}/api/get-public-key`)
+                .then(res => res.json())
+                .then(data => {
+                    RAZORPAY_KEY_ID = data.key_id;
+                    console.log('✅ Key loaded:', RAZORPAY_KEY_ID);
+                    
+                    payBtn.disabled = false;
+                    alreadyBtn.disabled = false;
+                    payBtn.textContent = '💰 Pay Now';
+                })
+                .catch(err => {
+                    console.error('❌ Key load failed:', err);
+                    payBtn.textContent = '❌ Try Again';
+                });
+        });
+
+        function validateAndPay() {
+            if (!RAZORPAY_KEY_ID) {
+                alert('Payment system is still loading. Please wait...');
+                return;
+            }
+            if (validateAllFields(false)) {
+                handlePayment();
+            }
+        }     */
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM loaded - initializing buttons');
+            
+            // Auto-fill from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const paymentId = urlParams.get('pid');
+            const name = urlParams.get('name');
+            const email = urlParams.get('email');
+            const phone = urlParams.get('phone');
+            
+            if (paymentId) {
+                document.getElementById('payment-id').value = paymentId;
+            }
+            if (name) {
+                document.getElementById('fullname').value = name;
+                validateField('fullname', 'Full name is required');
+            }
+            if (email) {
+                document.getElementById('email').value = email;
+                validateEmail();
+            }
+            if (phone) {
+                document.getElementById('phone').value = phone;
+                validatePhone();
+            }
+            
+            console.log('✅ All handlers attached');
+        });
+        
+        // ============================================
+        // VALIDATION FUNCTIONS
+        // ============================================
+        
+        function validateField(fieldId, errorMessage) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + '-error');
+            const value = field.value.trim();
+            
+            if (!value) {
+                field.classList.add('error');
+                field.classList.remove('valid');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                field.classList.remove('error');
+                field.classList.add('valid');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+        
+        function validateEmail() {
+            const email = document.getElementById('email');
+            const errorDiv = document.getElementById('email-error');
+            const value = email.value.trim();
+            
+            // Email regex for basic validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!value) {
+                email.classList.add('error');
+                email.classList.remove('valid');
+                errorDiv.textContent = 'Email is required';
+                errorDiv.classList.add('show');
+                return false;
+            } else if (!emailRegex.test(value)) {
+                email.classList.add('error');
+                email.classList.remove('valid');
+                errorDiv.textContent = 'Please enter a valid email address (e.g., name@example.com)';
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                email.classList.remove('error');
+                email.classList.add('valid');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+        
+        function validatePhone() {
+            const phone = document.getElementById('phone');
+            const errorDiv = document.getElementById('phone-error');
+            const value = phone.value.trim();
+            
+            // Phone regex - allows +, numbers, and minimum length
+            const phoneRegex = /^\+?[0-9]{10,15}$/;
+            
+            if (!value) {
+                phone.classList.add('error');
+                phone.classList.remove('valid');
+                errorDiv.textContent = 'Phone number is required';
+                errorDiv.classList.add('show');
+                return false;
+            } else if (!phoneRegex.test(value.replace(/[\s-]/g, ''))) {
+                phone.classList.add('error');
+                phone.classList.remove('valid');
+                errorDiv.textContent = 'Please enter a valid phone number with country code (e.g., +919876543210)';
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                phone.classList.remove('error');
+                phone.classList.add('valid');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+        
+        function validatePaymentId() {
+            const paymentId = document.getElementById('payment-id');
+            const errorDiv = document.getElementById('payment-id-error');
+            const value = paymentId.value.trim();
+            
+            if (!value) {
+                paymentId.classList.add('error');
+                paymentId.classList.remove('valid');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                paymentId.classList.remove('error');
+                paymentId.classList.add('valid');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+        
+        function validateAllFields(includePaymentId = false) {
+            const fields = [
+                { id: 'fullname', validator: () => validateField('fullname', 'Full name is required') },
+                { id: 'email', validator: validateEmail },
+                { id: 'phone', validator: validatePhone }
+            ];
+            
+            if (includePaymentId) {
+                fields.push({ id: 'payment-id', validator: validatePaymentId });
+            }
+            
+            const errors = [];
+            const errorSummary = document.getElementById('error-summary');
+            const errorList = document.getElementById('error-list');
+            
+            // Clear previous errors
+            errorList.innerHTML = '';
+            
+            // Run all validations
+            fields.forEach(field => {
+                const isValid = field.validator();
+                if (!isValid) {
+                    const label = document.querySelector(`label[for="${field.id}"]`).textContent.replace('*', '').trim();
+                    errors.push(`${label} is required or invalid`);
+                }
+            });
+            
+            // Show/hide error summary
+            if (errors.length > 0) {
+                errorList.innerHTML = errors.map(err => `<li>${err}</li>`).join('');
+                errorSummary.classList.add('show');
+                errorSummary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                errorSummary.classList.remove('show');
+            }
+            
+            return errors.length === 0;
+        }
+        
+        // ============================================
+        // ACTION FUNCTIONS
+        // ============================================
+        
+        function validateAndPay() {
+            // Validate only name, email, phone (not payment ID)
+            if (validateAllFields(false)) {
+                handlePayment();
+            }
+        }
+        
+        function showPaymentIdSection() {
+            // NO VALIDATION - just show the payment ID section
+            const section = document.getElementById('payment-id-section');
+            section.classList.add('show');
+            section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function validateAndGetLink() {
+            // Validate ALL fields including payment ID
+            if (validateAllFields(true)) {
+                getWhatsAppLink();
+            }
+        }
+        
+        // ============================================
+        // New Payment Flow
+        // ============================================
+// ============================================
+// UPDATED FRONTEND - Just one API call!
+// ============================================
+
+        async function handlePayment() {
+            console.log('💰 Payment button clicked');
+            
+            const payButton = document.getElementById('pay-button');
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            
+            try {
+                payButton.disabled = true;
+                payButton.textContent = 'Initializing...';
+                
+                // 1. ONE API CALL to get everything
+                const response = await fetch(`${API_BASE_URL}/api/get-checkout-options`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        amount: 51, // ₹51
+                        fullname: fullname,
+                        email: email,
+                        phone: phone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to initialize payment');
+                }
+                
+                console.log('📦 Received checkout package:', data);
+                
+                // 2. Get the complete options package from server
+                const options = data.checkout_options;
+                
+                // 3. Add the handler function (since functions can't be JSON)
+                options.handler = function(response) {
+                    console.log('✅ Payment successful:', response);
+                    
+                    // Send to server for verification
+                    fetch(`${API_BASE_URL}/api/payment-success`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                            customer: {
+                                fullname: fullname,
+                                email: email,
+                                phone: phone
+                            }
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(verification => {
+                        if (verification.success) {
+                            // Show success page with WhatsApp link
+                            document.getElementById('payment-form').classList.add('hidden');
+                            document.getElementById('success-section').classList.remove('hidden');
+                            document.getElementById('payment-id-display').textContent = 
+                                `Payment ID: ${response.razorpay_payment_id}`;
+                            document.getElementById('new-payment-id-tag').textContent = 
+                                response.razorpay_payment_id;
+                        } else {
+                            alert('Payment verification failed: ' + verification.error);
+                        }
+                    });
+                };
+                
+                // 4. Add modal ondismiss handler
+                options.modal.ondismiss = function() {
+                    console.log('⚠️ Payment cancelled');
+                    payButton.disabled = false;
+                    payButton.textContent = '💰 Pay Now';
+                };
+                
+                // 5. Open Razorpay checkout
+                console.log('🚀 Opening Razorpay with options');
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+            } catch (error) {
+                console.error('❌ Payment error:', error);
+                alert('Payment failed: ' + error.message);
+                payButton.disabled = false;
+                payButton.textContent = '💰 Pay Now';
+            }
+        }
+        
+        async function handlePaymentSuccess(response, fullname, email, phone) {
+            console.log('💰 Payment success callback', response);
+            
+            const payButton = document.getElementById('pay-button');
+            const paymentForm = document.getElementById('payment-form');
+            const successSection = document.getElementById('success-section');
+            const paymentIdDisplay = document.getElementById('payment-id-display');
+            const newPaymentIdTag = document.getElementById('new-payment-id-tag');
+            const successWhatsAppLink = document.getElementById('success-whatsapp-link');
+            
+            try {
+                // Save payment details to backend
+                await fetch(`${API_BASE_URL}/api/save-payment-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        paymentId: response.razorpay_payment_id,
+                        orderId: response.razorpay_order_id,
+                        customerName: fullname,
+                        customerEmail: email,
+                        customerPhone: phone,
+                        amount: 5100, // ₹51 in paise
+                        workshopName: 'Addiction Healing Workshop',
+                        workshopDate: new Date().toISOString().split('T')[0]
+                    })
+                });
+                
+                // Verify payment on backend
+                const verifyResponse = await fetch(`${API_BASE_URL}/api/verify-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature
+                        // ❌ REMOVED key_secret - backend uses its own
+                    })
+                });
+                
+                const verifyData = await verifyResponse.json();
+                
+                if (verifyData.success) {
+                    console.log('✅ Payment verified');
+                    
+                    // Hide payment form, show success section
+                    paymentForm.classList.add('hidden');
+                    successSection.classList.remove('hidden');
+                    
+                    // Display payment ID
+                    paymentIdDisplay.textContent = `Payment ID: ${response.razorpay_payment_id}`;
+                    
+                    // Set payment ID for tag instructions
+                    newPaymentIdTag.textContent = response.razorpay_payment_id;
+                    
+                    // Set direct WhatsApp link
+                    successWhatsAppLink.href = REAL_WHATSAPP_LINK;
+                    
+                } else {
+                    throw new Error(verifyData.error || 'Verification failed');
+                }
+                
+            } catch (error) {
+                console.error('❌ Verification error:', error);
+                
+                // Still show success with payment ID
+                paymentForm.classList.add('hidden');
+                successSection.classList.remove('hidden');
+                paymentIdDisplay.textContent = `Payment ID: ${response.razorpay_payment_id} (Please save this)`;
+                newPaymentIdTag.textContent = response.razorpay_payment_id;
+                successWhatsAppLink.href = REAL_WHATSAPP_LINK;
+            }
+            
+            payButton.disabled = false;
+            payButton.textContent = 'Pay Now';
+        }
+        
+        // ============================================
+        // Get WhatsApp Link for Existing Payment
+        // ============================================
+        async function getWhatsAppLink() {
+            console.log('🔍 Getting WhatsApp link for existing payment');
+            
+            // Get form data from shared fields
+            const fullname = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const paymentId = document.getElementById('payment-id').value.trim();
+            
+            setLinkLoading(true);
+            hideLinkResult();
+            
+            try {
+                // Fetch payment details
+                const response = await fetch(`${API_BASE_URL}/api/get-payment-details`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.payments.length > 0) {
+                    const payment = data.payments[0];
+                    
+                    // Verify that the provided details match
+                    const nameMatch = (payment.customerName || '').toLowerCase() === fullname.toLowerCase();
+                    const emailMatch = (payment.customerEmail || payment.email || '').toLowerCase() === email.toLowerCase();
+                    const phoneMatch = (payment.customerPhone || payment.phone || '') === phone;
+                    
+                    if (!nameMatch || !emailMatch || !phoneMatch) {
+                        showLinkAlert('The provided details do not match our records. Please check and try again.', 'error');
+                        setLinkLoading(false);
+                        return;
+                    }
+                    
+                    currentPaymentData = payment;
+                    
+                    // Display payment details and DIRECT WhatsApp link
+                    displayWhatsAppLink(payment);
+                    
+                } else {
+                    showLinkAlert('No payment found with this ID. Please check and try again.', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error fetching payment:', error);
+                showLinkAlert('Error fetching payment details. Please try again.', 'error');
+            } finally {
+                setLinkLoading(false);
+            }
+        }
+        
+        function displayWhatsAppLink(payment) {
+            const date = new Date(payment.timestamp || payment.receivedAt || Date.now());
+            const formattedDate = date.toLocaleString();
+            
+            const detailsHtml = `
+                <p><strong>Payment ID:</strong> ${payment.paymentId}</p>
+                <p><strong>Name:</strong> ${payment.customerName || payment.customer_name}</p>
+                <p><strong>Email:</strong> ${payment.customerEmail || payment.email}</p>
+                <p><strong>Phone:</strong> ${payment.customerPhone || payment.phone}</p>
+                <p><strong>Amount:</strong> ₹${((payment.amount || 0) / 100).toFixed(2)}</p>
+                <p><strong>Date:</strong> ${formattedDate}</p>
+            `;
+            
+            document.getElementById('payment-details-display').innerHTML = detailsHtml;
+            
+            // Set direct WhatsApp link
+            const directLink = document.getElementById('direct-whatsapp-link');
+            directLink.href = REAL_WHATSAPP_LINK;
+            
+            // Set payment ID for tag instructions
+            document.getElementById('payment-id-tag').textContent = payment.paymentId;
+            
+            document.getElementById('link-result').classList.add('show');
+            hideLinkAlert();
+        }
+        
+        // ============================================
+        // Utility Functions
+        // ============================================
+        function setLinkLoading(isLoading) {
+            document.getElementById('link-loader').style.display = isLoading ? 'block' : 'none';
+            document.getElementById('get-link-btn').disabled = isLoading;
+        }
+        
+        function showLinkAlert(message, type) {
+            const alert = document.getElementById('link-alert');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+        }
+        
+        function hideLinkAlert() {
+            document.getElementById('link-alert').className = 'alert';
+            document.getElementById('link-alert').textContent = '';
+        }
+        
+        function hideLinkResult() {
+            document.getElementById('link-result').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
