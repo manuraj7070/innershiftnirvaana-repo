@@ -785,18 +785,16 @@ function sanitizeCustomerData(fullname, email, phone) {
         async function handlePayment() {
             console.log('💰 Payment button clicked');
             
-            const payButton = document.getElementById('pay-button');
-            const fullname = document.getElementById('fullname').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
-            
+            let fullname = document.getElementById('fullname').value.trim();
+            let email = document.getElementById('email').value.trim();
+            let phone = document.getElementById('phone').value.trim();       
             try {
 // Use it right after getting the values
 let cleanData = sanitizeCustomerData(fullname, email, phone);
 fullname = cleanData.fullname;
 email = cleanData.email;
 phone = cleanData.phone;
-                
+
 // STEP 1: Clear ALL cached Razorpay data
 console.log('🧹 Clearing Razorpay cache...');
 localStorage.removeItem('razorpay_session');
