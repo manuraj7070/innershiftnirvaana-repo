@@ -131,6 +131,14 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
+        .razorpay-verified-badge {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
         #pay-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -173,6 +181,40 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+/* Force payment-id-section to have height */
+/* Ensure payment section has height */
+#payment-id-section {
+    display: none;  /* Hidden by default */
+    margin-top: 20px;
+    animation: slideDown 0.3s ease;
+}
+
+#payment-id-section.show {
+    display: block;  /* Shown when 'show' class is added */
+}
+
+/* Style the result div */
+#razorpay-result {
+    display: block;
+    min-height: 300px;
+    height: auto;
+    margin: 30px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    overflow: visible;
+}
+
+/* Add a subtle animation when new content appears */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#razorpay-result {
+    animation: fadeIn 0.5s ease-out;
+}
         .status {
             margin-top: 20px;
             padding: 25px;
@@ -340,7 +382,7 @@
                 <h1>Addiction Healing Workshop</h1>
                 <div class="subtitle">Transform your life with our guided sessions</div>
                 
-                <!-- Intake Form Fields (shared for both flows) -->
+                <!-- Intake Form Fields -->
                 <div class="form-group">
                     <label for="fullname" class="required">Full Name</label>
                     <input type="text" id="fullname" placeholder="Enter your full name" 
@@ -379,7 +421,7 @@
                 </div>
                 
                 <!-- Payment ID Section (Hidden initially) -->
-                <div id="payment-id-section">
+                <div id="payment-id-section" class="hidden">
                     <div class="form-group">
                         <label for="payment-id" class="required">Payment ID</label>
                         <input type="text" id="payment-id" placeholder="Enter your payment ID (e.g., pay_SQToPV0FDqas5k)"
@@ -387,21 +429,30 @@
                                onblur="validatePaymentId()">
                         <div id="payment-id-error" class="error-message">Payment ID is required</div>
                     </div>
-                    <button id="get-link-btn" type="button" onclick="validateAndGetLink()">🔑 Get WhatsApp Link</button>
                     
+                    <!-- Two verification options -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+<!--                         <button id="get-link-btn" type="button" onclick="validateAndGetLink()" style="flex: 1; padding: 12px; background: #25D366; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            🔍 Verify with Our Records
+                        </button> -->
+                        <button id="razorpay-verify-btn" type="button" onclick="validateAndVerifyWithRazorpay()" style="flex: 1; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            ✅ Verify with Razorpay
+                        </button>
+                    </div>
+    
                     <!-- Loader -->
                     <div id="link-loader" class="loader"></div>
                     
                     <!-- Alert Messages -->
                     <div id="link-alert" class="alert"></div>
                     
-                    <!-- Link Result Container -->
+                    <!-- Link Result Container (Our Records verification) -->
                     <div id="link-result" class="link-result">
                         <h4 style="margin-bottom: 15px; color: #155724;">✅ Payment Verified!</h4>
                         
                         <div id="payment-details-display" class="payment-details-box"></div>
                         
-                        <!-- DIRECT WHATSAPP LINK (no obfuscation) -->
+                        <!-- DIRECT WHATSAPP LINK -->
                         <div style="margin: 20px 0;">
                             <a href="#" id="direct-whatsapp-link" class="whatsapp-button" target="_blank">
                                 📱 Join WhatsApp Group Now
@@ -414,7 +465,7 @@
                             <strong>After joining, set your member tag:</strong>
                             <ol>
                                 <li>Tap group name → Members → "You"</li>
-                                <p style="margin: 8px 0 8px 20px;">5. Tap <strong>"You"</strong> → <strong style="background: #e8f5e8; padding: 2px 5px;">"Add member tag"</strong> <span style="color: #dc3545;">(mobile only)</span></p>
+                                <li>Tap "Add member tag" <span style="color: #dc3545;">(mobile only)</span></li>
                                 <li>Enter your Payment ID: <span id="payment-id-tag" style="font-family: monospace; background: #fff; padding: 2px 5px; border-radius: 3px;"></span></li>
                                 <li>Save - This verifies your membership!</li>
                             </ol>
@@ -424,6 +475,9 @@
                             ⏱️ Keep this link safe. Reset group link periodically for security.
                         </div>
                     </div>
+                    
+                    <!-- Razorpay Result Container (for direct verification) -->
+                    <div id="razorpay-result" style="display: none; margin-top: 20px;"></div>
                 </div>
             </div>
             
@@ -471,7 +525,37 @@
 
         let RAZORPAY_KEY_ID = null;
         let keyLoadPromise = null;
-        // Your backend API URL
+        let currentVerificationMethod = 'our'; // Default to our records
+    
+        function setVerificationMethod(method) {
+            currentVerificationMethod = method;
+            
+            // Update button styles
+            const ourBtn = document.getElementById('verify-method-our');
+            const razorpayBtn = document.getElementById('verify-method-razorpay');
+            
+            if (method === 'our') {
+                ourBtn.style.background = '#25D366';
+                ourBtn.style.color = 'white';
+                razorpayBtn.style.background = '#f0f0f0';
+                razorpayBtn.style.color = '#666';
+            } else {
+                razorpayBtn.style.background = '#667eea';
+                razorpayBtn.style.color = 'white';
+                ourBtn.style.background = '#f0f0f0';
+                ourBtn.style.color = '#666';
+            }
+        }
+        
+        function verifyWithSelectedMethod() {
+            if (!validateAllFields(true)) return;
+            
+            if (currentVerificationMethod === 'our') {
+                getWhatsAppLink();
+            } else {
+                verifyWithRazorpay();
+            }
+        }        // Your backend API URL
         const API_BASE_URL = 'https://render-payment-webhook-production-c909.up.railway.app';       
 
         // The REAL WhatsApp group link - shown directly on success
@@ -753,7 +837,12 @@
                 getWhatsAppLink();
             }
         }
-        
+        // NEW: Validate and verify with Razorpay directly
+        function validateAndVerifyWithRazorpay() {
+            if (validateAllFields(true)) {
+                verifyWithRazorpay();
+            }
+        }        
         // ============================================
         // New Payment Flow
         // ============================================
@@ -1064,7 +1153,291 @@ document.cookie.split(";").forEach(function(c) {
             document.getElementById('link-loader').style.display = isLoading ? 'block' : 'none';
             document.getElementById('get-link-btn').disabled = isLoading;
         }
+// ============================================
+// FIXED: Verify payment directly with Razorpay API
+// ============================================
+async function verifyWithRazorpay() {
+    console.log('🔍 Verifying payment with Razorpay directly');
+    
+    // Get form values
+    const fullname = document.getElementById('fullname').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const paymentId = document.getElementById('payment-id').value.trim();
+    
+    // Validate
+    if (!paymentId) {
+        alert('Please enter a Payment ID');
+        return;
+    }
+    
+    // Show loader, hide previous results
+    setLinkLoading(true);
+    hideLinkResult();
+    hideRazorpayResult();
+    
+    try {
+        console.log('📤 Sending request to backend with paymentId:', paymentId);
         
+        const response = await fetch(`${API_BASE_URL}/api/razorpay-verify-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                paymentId,
+                fullname,
+                email,
+                phone
+            })
+        });
+        
+        console.log('📡 Response status:', response.status);
+        
+        const data = await response.json();
+        console.log('📦 Response data:', data);
+        
+        if (data.success) {
+            console.log('✅ Payment verified successfully');
+            
+            // Make sure the display function exists
+            if (typeof displayRazorpayResult === 'function') {
+                // Call the display function
+                displayRazorpayResult(data.payment, fullname, email, phone);
+                
+                // Force scroll to result
+                setTimeout(() => {
+                    const resultDiv = document.getElementById('razorpay-result');
+                    if (resultDiv) {
+                        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Add a temporary highlight
+                        resultDiv.style.transition = 'box-shadow 0.5s';
+                        resultDiv.style.boxShadow = '0 0 0 3px #25D366';
+                        setTimeout(() => {
+                            resultDiv.style.boxShadow = 'none';
+                        }, 2000);
+                    }
+                }, 300);
+            } else {
+                console.error('❌ displayRazorpayResult function not found!');
+                // Fallback
+                const resultDiv = document.getElementById('razorpay-result');
+                if (resultDiv) {
+                    resultDiv.innerHTML = `
+                        <div style="background: #d4edda; padding: 20px; border-radius: 8px;">
+                            <h4 style="color: #155724;">✅ Payment Verified!</h4>
+                            <p>Payment ID: ${data.payment.id}</p>
+                            <a href="${REAL_WHATSAPP_LINK}" class="whatsapp-button" target="_blank">Join WhatsApp Group</a>
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                }
+            }
+        } else {
+            console.log('❌ Verification failed:', data.error);
+            showRazorpayError(data.error || 'Payment verification failed');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error in verifyWithRazorpay:', error);
+        showRazorpayError('Network error: ' + error.message);
+    } finally {
+        console.log('🏁 Turning off loader');
+        setLinkLoading(false); // THIS IS CRITICAL - turns off the spinner
+    }
+}
+
+// This should be somewhere in your code
+function setLinkLoading(isLoading) {
+    const loader = document.getElementById('link-loader');
+    const verifyBtn = document.getElementById('razorpay-verify-btn');
+    const ourBtn = document.getElementById('get-link-btn');
+    
+    if (loader) {
+        loader.style.display = isLoading ? 'block' : 'none';
+    }
+    
+    if (verifyBtn) {
+        verifyBtn.disabled = isLoading;
+    }
+    
+    if (ourBtn) {
+        ourBtn.disabled = isLoading;
+    }
+    
+    console.log('Loader state:', isLoading ? 'ON' : 'OFF');
+}
+
+        // ============================================
+        // NEW: Display Razorpay-verified result
+        // ============================================
+        function displayRazorpayResult(payment, fullname, email, phone) {
+            const resultDiv = document.getElementById('razorpay-result');
+            const date = new Date(payment.created_at * 1000);
+            const formattedDate = date.toLocaleString('en-IN', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Format amount (Razorpay returns amount in paise)
+            const amountInRupees = (payment.amount / 100).toFixed(2);
+            
+            // Determine payment method display
+            let methodDisplay = payment.method;
+            if (payment.method === 'card') {
+                methodDisplay = `💳 Card (${payment.card?.network || 'Unknown'})`;
+            } else if (payment.method === 'upi') {
+                methodDisplay = `📱 UPI (${payment.upi?.vpa || 'Unknown'})`;
+            } else if (payment.method === 'netbanking') {
+                methodDisplay = `🏦 Netbanking (${payment.bank || 'Unknown'})`;
+            }
+            
+            // Build the HTML
+            resultDiv.innerHTML = `
+                <div class="razorpay-verified-badge" style="background: #d4edda; border-left: 4px solid #28a745; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong style="color: #155724; font-size: 16px;">✅ Verified by Razorpay</strong>
+                    <p style="color: #155724; margin-top: 5px; font-size: 14px;">This payment has been confirmed directly with Razorpay's servers.</p>
+                </div>
+                
+                <div class="payment-details-box" style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0; border: 1px solid #e0e0e0;">
+                    <h4 style="margin-bottom: 15px; color: #333;">Payment Details</h4>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 10px; font-size: 14px;">
+                        <div style="color: #666; font-weight: 500;">Payment ID:</div>
+                        <div style="color: #333; font-family: monospace;">${payment.id}</div>
+                        
+                        <div style="color: #666; font-weight: 500;">Amount:</div>
+                        <div style="color: #333; font-weight: bold;">₹${amountInRupees}</div>
+                        
+                        <div style="color: #666; font-weight: 500;">Status:</div>
+                        <div style="color: ${payment.status === 'captured' ? '#28a745' : '#dc3545'};">
+                            ${payment.status === 'captured' ? '✅ Success' : payment.status}
+                        </div>
+                        
+                        <div style="color: #666; font-weight: 500;">Method:</div>
+                        <div style="color: #333;">${methodDisplay}</div>
+                        
+                        <div style="color: #666; font-weight: 500;">Email:</div>
+                        <div style="color: #333;">${payment.email || email || 'Not provided'}</div>
+                        
+                        <div style="color: #666; font-weight: 500;">Phone:</div>
+                        <div style="color: #333;">${payment.contact || phone || 'Not provided'}</div>
+                        
+                        <div style="color: #666; font-weight: 500;">Date:</div>
+                        <div style="color: #333;">${formattedDate}</div>
+                    </div>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <a href="${REAL_WHATSAPP_LINK}" class="whatsapp-button" target="_blank" style="display: block; text-align: center; padding: 15px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                        📱 Join WhatsApp Group Now
+                    </a>
+                </div>
+                
+                <div class="tag-instructions" style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <span class="badge" style="display: inline-block; background: #667eea; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; margin-right: 10px;">IMPORTANT</span>
+                    <strong>After joining, set your member tag:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Open the WhatsApp group on your <strong>mobile app</strong></li>
+                        <li>Tap group name → Members → "You"</li>
+                        <li>Tap "Add member tag" <span style="color: #dc3545;">(mobile only)</span></li>
+                        <li>Enter your Payment ID: <span style="font-family: monospace; background: #fff; padding: 2px 5px; border-radius: 3px; font-weight: bold;">${payment.id}</span></li>
+                        <li>Tap Save - This verifies your membership!</li>
+                    </ol>
+                </div>
+                
+                <div class="info-text" style="font-size: 13px; color: #666; text-align: center; margin-top: 15px;">
+                    ⏱️ This payment was verified on ${formattedDate}
+                </div>
+            `;
+            
+            // Hide the original link result if it's showing
+            document.getElementById('link-result').classList.remove('show');
+            
+            // Show the Razorpay result
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+// Force scroll to the result
+document.getElementById('razorpay-result').scrollIntoView({ 
+    behavior: 'smooth', 
+    block: 'center' 
+})
+// At the end of your displayRazorpayResult function, add:
+setTimeout(() => {
+    const resultDiv = document.getElementById('razorpay-result');
+    resultDiv.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+    
+    // Highlight it briefly so user notices
+    resultDiv.style.transition = 'box-shadow 0.5s';
+    resultDiv.style.boxShadow = '0 0 0 4px #25D366';
+    setTimeout(() => {
+        resultDiv.style.boxShadow = 'none';
+    }, 2000);
+}, 300);
+
+// Also add a temporary red border to make it obvious
+document.getElementById('razorpay-result').style.border = '5px solid red';
+        }
+
+        // ============================================
+        // NEW: Show Razorpay error
+        // ============================================
+        function showRazorpayError(message) {
+            const resultDiv = document.getElementById('razorpay-result');
+            
+            resultDiv.innerHTML = `
+                <div style="background: #f8d7da; border-left: 4px solid #dc3545; padding: 20px; border-radius: 8px; margin-top: 20px;">
+                    <h4 style="color: #721c24; margin-bottom: 10px;">❌ Verification Failed</h4>
+                    <p style="color: #721c24;">${message}</p>
+                    <hr style="margin: 15px 0; border: 1px solid #f5c6cb;">
+                    <p style="color: #721c24; font-size: 14px;">
+                        <strong>Possible reasons:</strong>
+                    </p>
+                    <ul style="color: #721c24; margin-left: 20px; font-size: 13px;">
+                        <li>Invalid Payment ID</li>
+                        <li>Payment hasn't been processed yet</li>
+                        <li>Network issue connecting to Razorpay</li>
+                    </ul>
+                    <p style="color: #721c24; margin-top: 15px; font-size: 13px;">
+                        If you believe this is an error, please contact support with your Payment ID.
+                    </p>
+                </div>
+            `;
+            
+            resultDiv.style.display = 'block';
+        }
+
+        // ============================================
+        // NEW: Hide Razorpay result
+        // ============================================
+        function hideRazorpayResult() {
+            const resultDiv = document.getElementById('razorpay-result');
+            resultDiv.style.display = 'none';
+            resultDiv.innerHTML = '';
+        }
+
+        // ============================================
+        // NEW: Helper to check if Razorpay payment exists
+        // ============================================
+        async function checkRazorpayPaymentStatus(paymentId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/razorpay-payment-status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ paymentId })
+                });
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('❌ Error checking payment status:', error);
+                return { success: false, error: error.message };
+            }
+        }        
         function showLinkAlert(message, type) {
             const alert = document.getElementById('link-alert');
             alert.className = `alert alert-${type}`;
