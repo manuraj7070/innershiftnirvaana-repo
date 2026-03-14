@@ -488,7 +488,10 @@
                     const response = await fetch(`${API_BASE_URL}/api/get-public-key`);
                     const data = await response.json();
                     RAZORPAY_KEY_ID = data.key_id;
-                    console.log('✅ Razorpay key loaded:', RAZORPAY_KEY_ID);
+                    if (window.location.hostname === 'localhost' || window.location.hostname.includes('local')) {
+                        console.log('✅ Razorpay key loaded:', RAZORPAY_KEY_ID);
+                    }                    
+                    //console.log('✅ Razorpay key loaded:', RAZORPAY_KEY_ID);
                     resolve(RAZORPAY_KEY_ID);
                 } catch (error) {
                     console.error('❌ Failed to load Razorpay key:', error);
