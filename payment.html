@@ -1030,16 +1030,14 @@ document.cookie.split(";").forEach(function(c) {
                 payButton.textContent = 'Initializing...';
                 
                 // 1. ONE API CALL to get everything
-                const response = await fetch(`${API_BASE_URL}/api/get-checkout-options`, {
+                const response = await fetch(`${API_BASE_URL}/api/get-checkout-options?_t=${Date.now()}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        amount: 51, // ₹51
+                        amount: 51,
                         fullname: fullname,
                         email: email,
-                        phone: phone,
-        // Add a unique timestamp to force new session
-        _t: Date.now()
+                        phone: phone
                     })
                 });
                 
